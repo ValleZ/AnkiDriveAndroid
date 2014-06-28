@@ -86,6 +86,9 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
                 case 0x27:
                     Log.v(TAG, "received position! " + toHex(value) + " offs_center " + readFloat(value, 4) + " speed " + readShort(value, 8) + " clockwise " + value[9]);
                     break;
+                case 0x29:
+                    Log.v(TAG, "received transition! " + toHex(value) + " offs_center " + readFloat(value, 3) + " clockwise " + value[7]);
+                    break;
                 default:
                     Log.w(TAG, "received unknown response, type " + Integer.toHexString(value[1] & 0xff) + " full " + toHex(value));
                     break;
