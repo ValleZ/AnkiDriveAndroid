@@ -1,4 +1,6 @@
 AnkiDriveAndroid
 ================
 
-Anki Drive Android
+Anki Drive for Android
+
+MIT license
