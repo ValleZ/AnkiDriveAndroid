@@ -49,29 +49,34 @@ public final class ScanFragment extends Fragment {
         parentView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!gameSession.scanningForDevices) {
-                    handler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "scan finished " + gameSession.activeCars.size());
-                            gameSession.stopScanning();
-                            progressView.setVisibility(View.GONE);
-                            statusLabel.setText(gameSession.activeCars.isEmpty() ? "No cars found" : "Connecting...");
-                            for (AnkiCarInfo carInfo : gameSession.activeCars) {
-                                carInfo.connect(getActivity().getApplicationContext());
-                            }
-                        }
-                    }, 2000);
-                    gameSession.closeAllConnections();
-                    listAdapter.notifyDataSetChanged();
-                    progressView.setVisibility(View.VISIBLE);
-                    statusLabel.setText("Scanning...");
-                    gameSession.startScanning();
-                }
+                scan();
             }
         });
+        scan();
         return parentView;
+    }
+
+    private void scan() {
+        if (!gameSession.scanningForDevices) {
+            handler.postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    Log.d(TAG, "scan finished " + gameSession.activeCars.size());
+                    gameSession.stopScanning();
+                    progressView.setVisibility(View.GONE);
+                    statusLabel.setText(gameSession.activeCars.isEmpty() ? "No cars found" : "Connecting...");
+                    for (AnkiCarInfo carInfo : gameSession.activeCars) {
+                        carInfo.connect(getActivity().getApplicationContext());
+                    }
+                }
+            }, 2000);
+            gameSession.closeAllConnections();
+            listAdapter.notifyDataSetChanged();
+            progressView.setVisibility(View.VISIBLE);
+            statusLabel.setText("Scanning...");
+            gameSession.startScanning();
+        }
     }
 
     @Override
