@@ -14,6 +14,7 @@
             android:id="@+id/lights_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <ToggleButton
             android:id="@+id/sdk_mode_button"
             android:layout_width="wrap_content"
@@ -21,6 +22,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -45,6 +47,27 @@
             android:layout_weight="1"
             android:inputType="number"
             android:text="25000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/lane_set_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set lane" />
+
+        <EditText
+            android:id="@+id/lane_offset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="numberDecimal|numberSigned"
+            android:text="-65" />
+
     </LinearLayout>
 
 </LinearLayout>

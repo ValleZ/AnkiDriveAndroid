@@ -47,6 +47,13 @@ public final class CarFragment extends Fragment {
                 carInfo.setSpeed(Integer.parseInt(speedEdit.getText().toString()), Integer.parseInt(accelEdit.getText().toString()));
             }
         });
+        final EditText laneOffsEdit = (EditText) view.findViewById(R.id.lane_offset);
+        view.findViewById(R.id.lane_set_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                carInfo.setOffset(Float.parseFloat(laneOffsEdit.getText().toString()));
+            }
+        });
         return view;
     }
 

@@ -26,13 +26,6 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Press scan"
-        android:id="@+id/status_label" />
-
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"

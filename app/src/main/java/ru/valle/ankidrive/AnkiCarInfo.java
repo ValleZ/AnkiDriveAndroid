@@ -9,6 +9,8 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +28,8 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
     private static final byte[] CMD_SET_LIGHTS = new byte[]{0x2, 0x1d, 0};
     private static final byte[] CMD_SET_SDK_MODE = new byte[]{0x2, (byte) 0x90, 1};
     private static final byte[] CMD_SET_SPEED = new byte[]{0x6, 0x24, 0, 0, 0, 0, 0};
+    private static final byte[] CMD_CHANGE_LINE = new byte[]{0x9, 0x25, 0, 0, 0, 0, 0, 0, 0, 0};
+    private static final byte[] CMD_SET_OFFSET = new byte[]{0x5, 0x2c, 0, 0, 0, 0};
     boolean fullBattery;
     private static final String TAG = "AnkiCarInfo";
     boolean lowBattery;
@@ -114,11 +118,14 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
         }
     }
 
-    private float readFloat(byte[] bytes, int offs) {
+    public static float readFloat(byte[] bytes, int offs) {
         return Float.intBitsToFloat(((bytes[offs + 3] & 0xff) << 24) | ((bytes[offs + 2] & 0xff) << 16) | ((bytes[offs + 1] & 0xff) << 8) | (bytes[offs] & 0xff));
+//        return Float.intBitsToFloat(((bytes[offs + 0] & 0xff) << 24) | ((bytes[offs + 1] & 0xff) << 16) | ((bytes[offs + 2] & 0xff) << 8) | (bytes[offs+3] & 0xff));
+//        return ByteBuffer.wrap(bytes, offs, 4).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+//        return ByteBuffer.wrap(bytes, offs, 4).order(ByteOrder.BIG_ENDIAN).getFloat();
     }
 
-    private int readShort(byte[] bytes, int offs) {
+    public static int readShort(byte[] bytes, int offs) {
         return ((bytes[offs + 1] & 0xff) << 8) | (bytes[offs] & 0xff);
     }
 
@@ -196,8 +203,8 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
     }
 
     /**
-     * @param speed mm/sec
-     * @param accel mm/sec^2
+     * @param speed mm/sec from 0 to ~6000
+     * @param accel mm/sec^2 25000 is okay
      */
     public void setSpeed(int speed, int accel) {
         CMD_SET_SPEED[2] = (byte) (speed & 0xff);
@@ -205,6 +212,30 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
         CMD_SET_SPEED[4] = (byte) ((accel >> 8) & 0xff);
         CMD_SET_SPEED[5] = (byte) (accel & 0xff);
         sendCommand(CMD_SET_SPEED);
+    }
+
+    // it doesn't work
+    public void changeLane(int horizontalSpeed, float targetOffset, byte hopIntent, byte tag) {
+        CMD_CHANGE_LINE[2] = (byte) (horizontalSpeed & 0xff);
+        CMD_CHANGE_LINE[3] = (byte) ((horizontalSpeed >> 8) & 0xff);
+        int offsInt = Float.floatToIntBits(targetOffset);
+        CMD_CHANGE_LINE[4] = (byte) (offsInt & 0xff);
+        CMD_CHANGE_LINE[5] = (byte) ((offsInt >> 8) & 0xff);
+        CMD_CHANGE_LINE[6] = (byte) ((offsInt >> 16) & 0xff);
+        CMD_CHANGE_LINE[7] = (byte) ((offsInt >> 24) & 0xff);
+        CMD_CHANGE_LINE[8] = hopIntent;
+        CMD_CHANGE_LINE[9] = tag;
+        sendCommand(CMD_CHANGE_LINE);
+    }
+
+    //it doesn't work well either
+    public void setOffset(float targetOffset) {
+        int offsInt = Float.floatToIntBits(targetOffset);
+        CMD_SET_OFFSET[2] = (byte) (offsInt & 0xff);
+        CMD_SET_OFFSET[3] = (byte) ((offsInt >> 8) & 0xff);
+        CMD_SET_OFFSET[4] = (byte) ((offsInt >> 16) & 0xff);
+        CMD_SET_OFFSET[5] = (byte) ((offsInt >> 24) & 0xff);
+        sendCommand(CMD_SET_OFFSET);
     }
 
     public void setSdkMode(boolean turnOn) {
@@ -227,5 +258,34 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
         }
         return new String(hexChars);
     }
+
+    public static byte[] fromHex(String s) {
+        if (s != null) {
+            try {
+                StringBuilder sb = new StringBuilder(s.length());
+                for (int i = 0; i < s.length(); i++) {
+                    char ch = s.charAt(i);
+                    if (!Character.isWhitespace(ch)) {
+                        sb.append(ch);
+                    }
+                }
+                s = sb.toString();
+                int len = s.length();
+                byte[] data = new byte[len / 2];
+                for (int i = 0; i < len; i += 2) {
+                    int hi = (Character.digit(s.charAt(i), 16) << 4);
+                    int low = Character.digit(s.charAt(i + 1), 16);
+                    if (hi >= 256 || low < 0 || low >= 16) {
+                        return null;
+                    }
+                    data[i / 2] = (byte) (hi | low);
+                }
+                return data;
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
+    }
+
 
 }

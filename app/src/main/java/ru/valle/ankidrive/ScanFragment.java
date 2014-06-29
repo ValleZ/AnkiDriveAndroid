@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 public final class ScanFragment extends Fragment {
     public static final String TAG = "Anki";
-    private TextView statusLabel;
     private GameSession gameSession;
     private ArrayAdapter<AnkiCarInfo> listAdapter;
     private final Handler handler = new Handler();
@@ -34,7 +33,6 @@ public final class ScanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parentView = inflater.inflate(R.layout.fragment_scan, container, false);
-        statusLabel = (TextView) parentView.findViewById(R.id.status_label);
         progressView = parentView.findViewById(R.id.scan_progress_bar);
         gameSession = GameSession.getInstance(getActivity());
         listAdapter = new ArrayAdapter<AnkiCarInfo>(getActivity(), android.R.layout.simple_list_item_1, gameSession.activeCars);
@@ -65,7 +63,6 @@ public final class ScanFragment extends Fragment {
                     Log.d(TAG, "scan finished " + gameSession.activeCars.size());
                     gameSession.stopScanning();
                     progressView.setVisibility(View.GONE);
-                    statusLabel.setText(gameSession.activeCars.isEmpty() ? "No cars found" : "Connecting...");
                     for (AnkiCarInfo carInfo : gameSession.activeCars) {
                         carInfo.connect(getActivity().getApplicationContext());
                     }
@@ -74,7 +71,6 @@ public final class ScanFragment extends Fragment {
             gameSession.closeAllConnections();
             listAdapter.notifyDataSetChanged();
             progressView.setVisibility(View.VISIBLE);
-            statusLabel.setText("Scanning...");
             gameSession.startScanning();
         }
     }
@@ -89,21 +85,6 @@ public final class ScanFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         carSelectionListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
     }
 
 }
