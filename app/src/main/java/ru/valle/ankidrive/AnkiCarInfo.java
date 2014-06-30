@@ -97,14 +97,23 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
                     Log.v(TAG, "vehicle delocated! " + toHex(value));
                     break;
                 case 0x36:
-                    Log.v(TAG, "vehicle delocated! " + toHex(value));
+                    Log.v(TAG, "vehicle speed update! " + readFloat(value, 2));
                     break;
                 case 0x3f:
-                    Log.v(TAG, "vehicle delocated! " + toHex(value));
+                    Log.v(TAG, "vehicle status update! on charger " + value[3] + " battery low " + value[4] + " battery full " + value[5]);
+                    break;
+                case 0x41:
+                    Log.v(TAG, "lane relevant stuff: " + toHex(value));
                     break;
                 case 0x43:
-                    Log.v(TAG, "vehicle strayed! " + toHex(value));
+                    Log.v(TAG, "iphone relevant stuff: vehicle strayed? " + toHex(value));
                     break;
+                case (byte) 0x86:
+                case (byte) 0x44:
+                    Log.v(TAG, "iphone relevant stuff: unknown " + toHex(value));
+                    break;
+
+
                 default:
                     Log.w(TAG, "received unknown response, type " + Integer.toHexString(value[1] & 0xff) + " full " + toHex(value));
                     break;
