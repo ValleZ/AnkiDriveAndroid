@@ -136,6 +136,7 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
     public static final byte MASK_LIGHT_TYPE_ENGINE = 8;
 
     private void onSessionStart() {
+        sendCommand(CMD_SET_SDK_MODE);
 //        sendCommand(CMD_PING);
         sendCommand(CMD_VERSION_REQ);
 //        sendCommand(CMD_BATTERY_LEVEL_REQ);
@@ -237,12 +238,6 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
         CMD_SET_OFFSET[5] = (byte) ((offsInt >> 24) & 0xff);
         sendCommand(CMD_SET_OFFSET);
     }
-
-    public void setSdkMode(boolean turnOn) {
-        CMD_SET_SDK_MODE[2] = (byte) (turnOn ? 1 : 0);
-        sendCommand(CMD_SET_SDK_MODE);
-    }
-
 
     public static String toHex(byte[] bytes) {
         if (bytes == null) {

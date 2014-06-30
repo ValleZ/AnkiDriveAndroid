@@ -1,9 +1,7 @@
 package ru.valle.ankidrive;
 
-import android.app.Activity;
-import android.net.Uri;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,13 +28,6 @@ public final class CarFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 carInfo.lights(AnkiCarInfo.MASK_LIGHT_TYPE_ENGINE | AnkiCarInfo.MASK_LIGHT_TYPE_FRONTLIGHTS, isChecked);
-            }
-        });
-        ToggleButton sdkButton = (ToggleButton) view.findViewById(R.id.sdk_mode_button);
-        sdkButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                carInfo.setSdkMode(isChecked);
             }
         });
         final EditText speedEdit = (EditText) view.findViewById(R.id.speed);
