@@ -42,12 +42,11 @@ public final class CarFragment extends Fragment {
         view.findViewById(R.id.lane_set_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                carInfo.setOffset(Float.parseFloat(laneOffsEdit.getText().toString()));
+                carInfo.changeLane(1000, Float.parseFloat(laneOffsEdit.getText().toString()), (byte) 0, (byte) 0);
             }
         });
         return view;
     }
-
 
 
 }

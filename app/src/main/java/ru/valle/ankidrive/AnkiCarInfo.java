@@ -9,10 +9,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -224,7 +221,6 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
         sendCommand(CMD_SET_SPEED);
     }
 
-    // it doesn't work
     public void changeLane(int horizontalSpeed, float targetOffset, byte hopIntent, byte tag) {
         CMD_CHANGE_LINE[2] = (byte) (horizontalSpeed & 0xff);
         CMD_CHANGE_LINE[3] = (byte) ((horizontalSpeed >> 8) & 0xff);
@@ -235,17 +231,8 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
         CMD_CHANGE_LINE[7] = (byte) ((offsInt >> 24) & 0xff);
         CMD_CHANGE_LINE[8] = hopIntent;
         CMD_CHANGE_LINE[9] = tag;
+        sendCommand(CMD_SET_OFFSET);//zero
         sendCommand(CMD_CHANGE_LINE);
-    }
-
-    //it doesn't work well either
-    public void setOffset(float targetOffset) {
-        int offsInt = Float.floatToIntBits(targetOffset);
-        CMD_SET_OFFSET[2] = (byte) (offsInt & 0xff);
-        CMD_SET_OFFSET[3] = (byte) ((offsInt >> 8) & 0xff);
-        CMD_SET_OFFSET[4] = (byte) ((offsInt >> 16) & 0xff);
-        CMD_SET_OFFSET[5] = (byte) ((offsInt >> 24) & 0xff);
-        sendCommand(CMD_SET_OFFSET);
     }
 
     public static String toHex(byte[] bytes) {
