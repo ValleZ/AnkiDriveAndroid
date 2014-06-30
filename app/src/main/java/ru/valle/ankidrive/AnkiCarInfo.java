@@ -27,6 +27,9 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
     private static final byte[] CMD_SET_SPEED = new byte[]{0x6, 0x24, 0, 0, 0, 0, 0};
     private static final byte[] CMD_CHANGE_LINE = new byte[]{0x9, 0x25, 0, 0, 0, 0, 0, 0, 0, 0};
     private static final byte[] CMD_SET_OFFSET = new byte[]{0x5, 0x2c, 0, 0, 0, 0};
+    private final byte model;
+    private final int carId;
+    private final int productId;
     boolean fullBattery;
     private static final String TAG = "AnkiCarInfo";
     boolean lowBattery;
@@ -38,7 +41,7 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
     private BluetoothGatt gatt;
     private boolean readyToAcceptCommands;
 
-    public AnkiCarInfo(byte[] carInfoBytes) {
+    public AnkiCarInfo(byte modelId, int carId, int productId, byte[] carInfoBytes) {
         byte state = carInfoBytes[0];
         fullBattery = (state & (1 << 4)) == (1 << 4);
         lowBattery = (state & (1 << 5)) == (1 << 5);
@@ -49,17 +52,38 @@ public final class AnkiCarInfo extends BluetoothGattCallback {
         } else {
             carName = "AnkioCar";
         }
+        this.model = modelId;
+        this.carId = carId;
+        this.productId = productId;
     }
 
     @Override
     public String toString() {
         return "AnkiCarInfo{" +
-                "fullBattery=" + fullBattery +
+                "model=" + getModelDescription(model) +
+                ", carId=" + Integer.toHexString(carId) +
+                ", productId=" + Integer.toHexString(productId) +
+                ", fullBattery=" + fullBattery +
                 ", lowBattery=" + lowBattery +
                 ", charging=" + charging +
                 ", version=" + version +
                 ", carName='" + carName + '\'' +
                 '}';
+    }
+
+    private String getModelDescription(byte model) {
+        switch(model) {
+            case 1:
+                return "Kourai (Yellow)";
+            case 2:
+                return "Boson (Grey)";
+            case 3:
+                return "Rho (Red)";
+            case 4:
+                return "Katal (Blue)";
+            default:
+                return "" + model;
+        }
     }
 
     public void setBluetoothDevice(BluetoothDevice bluetoothDevice) {

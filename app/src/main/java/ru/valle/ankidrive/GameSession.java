@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,7 +17,6 @@ import java.util.UUID;
 public final class GameSession {
     private static final String TAG = "AnkiGameSession";
     private static GameSession instance;
-    private final Context context;
     private final BluetoothAdapter bluetoothAdapter;
     private final Handler handler;
     public boolean scanningForDevices;
@@ -27,7 +25,6 @@ public final class GameSession {
 
 
     private GameSession(Context context) {
-        this.context = context;
         final BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
         handler = new Handler();
@@ -88,6 +85,9 @@ public final class GameSession {
         boolean isAnkiCar = false;
         byte[] localName = null;
         int offset = 0;
+        int carId = -1;
+        byte model = -1;
+        int productId = -1;
         while (offset < (advertisedData.length - 2)) {
             int len = advertisedData[offset++];
             if (len == 0) {
@@ -119,13 +119,19 @@ public final class GameSession {
                 case 0x09://localname
                     localName = Arrays.copyOfRange(advertisedData, offset, offset += len - 1);
                     break;
+                case 0xff://mf data
+                    productId = ((advertisedData[offset] & 0xff) << 8) | (advertisedData[offset + 1] & 0xff);
+                    model = advertisedData[offset + 3];
+                    carId = ByteBuffer.wrap(advertisedData, offset + 4, 4).getInt();
+                    offset += len - 1;
+                    break;
                 default:
                     offset += (len - 1);
                     break;
             }
         }
 
-        return isAnkiCar && localName != null && localName.length >= 3 ? new AnkiCarInfo(localName) : null;
+        return isAnkiCar && localName != null && localName.length >= 3 ? new AnkiCarInfo(model, carId, productId, localName) : null;
     }
 
 
